@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QWidget,
+    QSizePolicy,
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon
@@ -21,14 +22,21 @@ class MainMenu(QWidget):
             parent,
         )
 
+        # setting widget id(for qss) and enabling the background styling on this qwidget cause you need to do that for some reason
+        self.setObjectName("MainMenu")
+        self.setAttribute(Qt.WA_StyledBackground, True)
+
+        # making sure it expands into the space provided
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
         # main horizontal layout
         self.h_box = QHBoxLayout(self)
         self.h_box.setContentsMargins(0, 0, 0, 0)
         self.h_box.setSpacing(0)
 
         # the side bar
-        self.side_bar = QWidget(self.parent())
-        self.side_bar.setStyleSheet("background-color:#171B26;")
+        self.side_bar = QWidget(self)
+        self.side_bar.setObjectName("SideBar")
         self.side_bar.setMaximumWidth(50)
         self.h_box.addWidget(self.side_bar)
 
@@ -45,6 +53,6 @@ class MainMenu(QWidget):
         self.star_icon.setPixmap(star_image)
         self.side_bar_v_box.addWidget(self.star_icon, alignment=Qt.AlignTop)
 
-        main_view = QStackedWidget(self.parent())
+        main_view = QStackedWidget(self)
 
         self.h_box.addWidget(main_view)

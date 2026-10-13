@@ -1,0 +1,7 @@
+#MainMenu {
+    background-color: #F5F4F1FF;
+}
+#SideBar {
+    background-color:#EFEFF0FF;
+    border-right: 2px solid rgb(223, 225, 227);
+}

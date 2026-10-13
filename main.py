@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QIcon
 from modules.main_menu import MainMenu
+from modules.theme_manager import ThemeManager
 
 app = QApplication(sys.argv)
 
@@ -30,13 +31,12 @@ window.setWindowIcon(QIcon("assets/app-icon.ico"))
 
 
 central_widget = QStackedWidget()
-central_widget.setStyleSheet("background-color:#11141C;")
+window.setCentralWidget(central_widget)
 
 main_menu = MainMenu()
-
 central_widget.addWidget(main_menu)
 
-window.setCentralWidget(central_widget)
+theme_manager = ThemeManager(app, True)
 
 window.show()
 sys.exit(app.exec())
