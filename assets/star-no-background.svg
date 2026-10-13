@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="226 201.5 800 800" width="800" height="800">
+  <defs>
+    <radialGradient id="starFill" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#FFF8D0"/>
+      <stop offset="60%" stop-color="#FFEFA8"/>
+      <stop offset="100%" stop-color="#FFD978"/>
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="32"/>
+    </filter>
+  </defs>
+
+  <!-- Glow -->
+  <path fill="#F5A83A" opacity="0.9" filter="url(#glow)"
+        d="M626 328 C650 420 665 510 700 540 C740 575 820 590 879 608 C820 626 740 642 700 676 C665 706 650 800 626 875 C602 800 587 706 552 676 C512 642 432 626 373 608 C432 590 512 575 552 540 C587 510 602 420 626 328 Z"/>
+
+  <!-- Star -->
+  <path fill="url(#starFill)"
+        d="M626 328 C650 420 665 510 700 540 C740 575 820 590 879 608 C820 626 740 642 700 676 C665 706 650 800 626 875 C602 800 587 706 552 676 C512 642 432 626 373 608 C432 590 512 575 552 540 C587 510 602 420 626 328 Z"/>
+</svg>
