@@ -33,7 +33,7 @@ window.setWindowIcon(QIcon("assets/app-icon.png"))
 central_widget = QStackedWidget()
 window.setCentralWidget(central_widget)
 
-theme_manager = ThemeManager(app, False)
+theme_manager = ThemeManager(app, True)
 
 main_menu = MainMenu(theme_manager)
 central_widget.addWidget(main_menu)

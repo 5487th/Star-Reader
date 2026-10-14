@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QApplication, QPushButton
+from PySide6.QtWidgets import QApplication, QPushButton, QLabel, QGraphicsOpacityEffect
 from PySide6.QtGui import QIcon
-from PySide6.QtCore import QObject, Signal, QSize
+from PySide6.QtCore import QObject, Signal, QSize, Qt, QPropertyAnimation, QEasingCurve
 
 
 class ThemeManager(QObject):
@@ -13,6 +13,8 @@ class ThemeManager(QObject):
         self.app = app
         self.is_dark_mode = dark_mode
 
+        self.transition_speed_MS = 300
+
         with open("assets/themes/light.qss", "r", encoding="utf-8") as file:
             self.light_mode_qss = file.read()
 
@@ -23,6 +25,8 @@ class ThemeManager(QObject):
             self.app.setStyleSheet(self.dark_mode_qss)
         else:
             self.app.setStyleSheet(self.light_mode_qss)
+
+        self._overlay = None
 
     def set_dark_mode(self):
         self.is_dark_mode = True
@@ -35,10 +39,45 @@ class ThemeManager(QObject):
         self.set_to_light.emit()
 
     def toggle_theme(self):
+        # grabs the active window
+        window = self.app.activeWindow()
+
+        # if the window is minimized or we are in a transition, instantly switch
+        if self.app.activeWindow() is None or self._overlay is not None:
+            if self.is_dark_mode:
+                self.set_light_mode()
+            else:
+                self.set_dark_mode()
+            return
+
+        # captures a screen shot of the window and overlays it on the window
+        self._overlay = QLabel(window)
+        self._overlay.setPixmap(window.grab())
+        self._overlay.setGeometry(window.rect())
+        self._overlay.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self._overlay.show()
+        self._overlay.raise_()
+
+        # switching theme while the window is hidden by the overlay
         if self.is_dark_mode:
             self.set_light_mode()
         else:
             self.set_dark_mode()
+
+        effect = QGraphicsOpacityEffect(self._overlay)
+        self._overlay.setGraphicsEffect(effect)
+
+        anim = QPropertyAnimation(effect, b"opacity", self._overlay)
+        anim.setDuration(self.transition_speed_MS)
+        anim.setStartValue(1.0)
+        anim.setEndValue(0.0)
+        anim.setEasingCurve(QEasingCurve.InOutQuad)
+        anim.finished.connect(self._end_transition)
+        anim.start()
+
+    def _end_transition(self):
+        self._overlay.deleteLater()
+        self._overlay = None
 
 
 class ThemedPushButton(QPushButton):
