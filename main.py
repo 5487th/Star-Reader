@@ -27,16 +27,16 @@ if os.name == "nt":
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 # this sets the icon and
-window.setWindowIcon(QIcon("assets/app-icon.ico"))
+window.setWindowIcon(QIcon("assets/app-icon.png"))
 
 
 central_widget = QStackedWidget()
 window.setCentralWidget(central_widget)
 
-main_menu = MainMenu()
-central_widget.addWidget(main_menu)
+theme_manager = ThemeManager(app, False)
 
-theme_manager = ThemeManager(app, True)
+main_menu = MainMenu(theme_manager)
+central_widget.addWidget(main_menu)
 
 window.show()
 sys.exit(app.exec())

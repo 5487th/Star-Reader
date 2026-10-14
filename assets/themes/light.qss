@@ -5,3 +5,7 @@
     background-color:#EFEFF0FF;
     border-right: 2px solid rgb(223, 225, 227);
 }
+
+#SideBarSeparator {
+    border-bottom: 2px solid rgb(223, 225, 227);
+}
