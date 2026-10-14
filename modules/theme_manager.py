@@ -79,6 +79,14 @@ class ThemeManager(QObject):
         self._overlay.deleteLater()
         self._overlay = None
 
+    def update(self):
+        if self.is_dark_mode:
+            self.is_dark_mode = True
+            self.app.setStyleSheet(self.dark_mode_qss)
+        else:
+            self.is_dark_mode = False
+            self.app.setStyleSheet(self.light_mode_qss)
+
 
 class ThemedPushButton(QPushButton):
     def __init__(
