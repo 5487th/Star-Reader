@@ -114,6 +114,23 @@ class MainMenu(QWidget):
 
         tabs_vbox_layout.addWidget(self.favourites_button, alignment=Qt.AlignHCenter)
 
+        # import buttono
+        self.import_button = ThemedPushButton(
+            theme_manager,
+            "assets/icons/plus.svg",
+            "assets/icons/plus-dark.svg",
+            27,
+            27,
+            0,
+            self.side_bar,
+        )
+        self.import_button.setObjectName("ImportButton")
+        self.import_button.setFixedHeight(37)
+        self.import_button.setFixedWidth(37)
+        self.import_button.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        self.side_bar_v_box.addWidget(self.import_button, alignment=Qt.AlignHCenter)
+
         self.side_bar_v_box.addStretch()
 
         # theme toggle button
@@ -211,22 +228,6 @@ class Library(QWidget):
         search_bar_layout.setContentsMargins(9, 0, 0, 0)
         search_bar_layout.addWidget(self.search_icon)
         search_bar_layout.addStretch()
-
-        # import book button
-        self.import_button = ThemedPushButton(
-            theme_manager,
-            "assets/icons/plus.svg",
-            "assets/icons/plus-dark.svg",
-            40,
-            40,
-            0,
-            self.search_bar_import_container,
-        )
-        self.import_button.setObjectName("ImportButton")
-        self.import_button.setFixedHeight(40)
-        self.import_button.setFixedWidth(40)
-
-        self.search_import_container_hbox.addWidget(self.import_button)
 
         # books display
 
