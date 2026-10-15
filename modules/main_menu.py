@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap, QIcon
 from modules.theme_manager import ThemedPushButton, ThemeManager
+from modules.books_manager import BooksManager
 
 
 class MainMenu(QWidget):
@@ -20,11 +21,13 @@ class MainMenu(QWidget):
     def __init__(
         self,
         theme_manager: ThemeManager,
+        books_manager: BooksManager,
         parent=None,
     ):
         super().__init__(parent)
 
         self.theme_manager = theme_manager
+        self.books_manager = books_manager
 
         # setting widget id(for qss) and enabling the background styling on this qwidget cause you need to do that for some reason
         self.setObjectName("MainMenu")
@@ -114,7 +117,7 @@ class MainMenu(QWidget):
 
         tabs_vbox_layout.addWidget(self.favourites_button, alignment=Qt.AlignHCenter)
 
-        # import buttono
+        # import button
         self.import_button = ThemedPushButton(
             theme_manager,
             "assets/icons/plus.svg",
@@ -156,8 +159,10 @@ class MainMenu(QWidget):
 
         self.main_view = QStackedWidget(self)
 
-        self.library = Library(self.theme_manager, self.main_view)
-        self.favourites = Favourites(self.theme_manager, self.main_view)
+        self.library = Library(self.theme_manager, self.books_manager, self.main_view)
+        self.favourites = Favourites(
+            self.theme_manager, self.books_manager, self.main_view
+        )
 
         self.main_view.addWidget(self.library)
         self.main_view.addWidget(self.favourites)
@@ -182,8 +187,11 @@ class MainMenu(QWidget):
 
 
 class Library(QWidget):
-    def __init__(self, theme_manager, parent):
+    def __init__(self, theme_manager, books_manager, parent):
         super().__init__(parent)
+        self.theme_manager = theme_manager
+        self.books_manager = books_manager
+
         self.vbox_container = QVBoxLayout(self)
         self.setLayout(self.vbox_container)
 
@@ -230,13 +238,21 @@ class Library(QWidget):
         search_bar_layout.addStretch()
 
         # books display
+        self.card_grid = QListWidget(self)
+        self.card_grid.setViewMode(QListWidget.ViewMode.IconMode)
+        self.card_grid.setResizeMode(QListWidget.ViewMode.Adjust)
+        self.card_grid.setSpacing(15)
+
+        self.vbox_container.addWidget(self.card_grid)
 
         self.vbox_container.addStretch()
 
 
 class Favourites(QWidget):
-    def __init__(self, theme_manager, parent=None):
+    def __init__(self, theme_manager, books_manager, parent=None):
         super().__init__(parent)
+        self.theme_manager = theme_manager
+        self.books_manager = books_manager
 
         self.vbox_container = QVBoxLayout(self)
         self.setLayout(self.vbox_container)

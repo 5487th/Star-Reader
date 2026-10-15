@@ -1,6 +1,6 @@
 import sys
 import os
-
+from pathlib import Path
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QIcon
 from modules.main_menu import MainMenu
 from modules.theme_manager import ThemeManager
+from modules.books_manager import BooksManager
 
 app = QApplication(sys.argv)
 
@@ -34,6 +35,7 @@ central_widget = QStackedWidget()
 window.setCentralWidget(central_widget)
 
 theme_manager = ThemeManager(app, True)
+book_manager = BooksManager(Path(__file__).resolve().parent)
 
 main_menu = MainMenu(theme_manager)
 central_widget.addWidget(main_menu)
