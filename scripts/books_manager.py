@@ -5,7 +5,9 @@ from peewee import SqliteDatabase, Model, CharField, AutoField, BooleanField
 import uuid
 import hashlib
 import shutil
-import mimetypes
+
+
+from scripts.cover_extractor import extract_cover
 
 
 class Book(Model):
@@ -78,20 +80,24 @@ class BooksManager:
 
         # getting cover
         cover_path = None
-        for item in book.get_items():
-            is_cover_type = item.get_type() == ebooklib.ITEM_COVER
-            is_cover_image = (
-                item.get_type() == ebooklib.ITEM_IMAGE
-                and "cover" in item.get_name().lower()
-            )
+        data = extract_cover(file)
 
-            if is_cover_type or is_cover_image:
-                ext = Path(item.get_name()).suffix or ".jpg"
-                cover_path = (
-                    self.book_covers_folder / f"{file.stem}_{uuid.uuid4().hex}{ext}"
+        if data:
+            ext = (
+                ".png"
+                if data.startswith(b"\x89PNG")
+                else (
+                    ".gif"
+                    if data.startswith(b"GIF")
+                    else (
+                        ".webp"
+                        if data[8:12] == b"WEBP"
+                        else ".svg" if b"<svg" in data[:4096].lower() else ".jpg"
+                    )
                 )
-                cover_path.write_bytes(item.get_content())
-                break
+            )
+        cover_path = self.book_covers_folder / f"{file.stem}_{uuid.uuid4().hex}{ext}"
+        cover_path.write_bytes(data)
 
         Book.create(
             title=title,
