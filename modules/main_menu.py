@@ -5,12 +5,16 @@ from PySide6.QtWidgets import (
     QLabel,
     QWidget,
     QSizePolicy,
-    QLineEdit,
 )
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap
+
 from modules.theme_manager import ThemedPushButton, ThemeManager
 from modules.books_manager import BooksManager
+from modules.library_screen import Library
+from modules.favourites_screen import Favourites
+
+from PySide6.QtWidgets import QFileDialog
 
 
 class MainMenu(QWidget):
@@ -185,109 +189,10 @@ class MainMenu(QWidget):
         pass
 
     def on_import_button_pressed(self, event):
-        print("add pressed!")
-        pass
-
-
-class Library(QWidget):
-    def __init__(self, theme_manager, books_manager, parent):
-        super().__init__(parent)
-        self.theme_manager: ThemeManager = theme_manager
-        self.books_manager: BooksManager = books_manager
-
-        self.vbox_container = QVBoxLayout(self)
-        self.setLayout(self.vbox_container)
-
-        self.setContentsMargins(40, 30, 40, 30)
-
-        self.heading = QLabel("Library", self)
-        self.heading.setObjectName("LibraryHeader")
-        self.vbox_container.addWidget(self.heading)
-
-        # search bar
-        self.search_bar_import_container = QWidget(self)
-        self.search_import_container_hbox = QHBoxLayout(
-            self.search_bar_import_container
-        )
-        self.search_import_container_hbox.setSpacing(80)
-        self.search_import_container_hbox.setContentsMargins(0, 0, 0, 0)
-
-        self.vbox_container.addWidget(self.search_bar_import_container)
-
-        self.search_bar = QLineEdit(self.search_bar_import_container)
-        self.search_bar.setObjectName("SearchBar")
-        self.search_bar.setPlaceholderText("Search your library...")
-        self.search_bar.setFixedHeight(40)
-        self.search_import_container_hbox.addWidget(self.search_bar)
-
-        self.search_icon = ThemedPushButton(
-            theme_manager,
-            "assets/icons/search.svg",
-            "assets/icons/search-dark.svg",
-            20,
-            20,
-            0,
-            parent=self.search_bar,
+        file_paths, _ = QFileDialog.getOpenFileNames(
+            self, "select your epub file/files", "", "E-books (*.epub)"
         )
 
-        self.search_icon.setFlat(True)
-        self.search_icon.setFocusPolicy(Qt.NoFocus)
-        self.search_icon.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.search_icon.setStyleSheet("background: transparent; border: none;")
-
-        search_bar_layout = QHBoxLayout(self.search_bar)
-        search_bar_layout.setContentsMargins(9, 0, 0, 0)
-        search_bar_layout.addWidget(self.search_icon)
-        search_bar_layout.addStretch()
-
-        # books display
-
-        self.vbox_container.addStretch()
-
-
-class Favourites(QWidget):
-    def __init__(self, theme_manager, books_manager, parent=None):
-        super().__init__(parent)
-        self.theme_manager = theme_manager
-        self.books_manager = books_manager
-
-        self.vbox_container = QVBoxLayout(self)
-        self.setLayout(self.vbox_container)
-
-        self.setContentsMargins(40, 30, 40, 30)
-
-        self.heading = QLabel("Favourite", self)
-        self.heading.setObjectName("FavouriteHeader")
-        self.vbox_container.addWidget(self.heading)
-
-        # search bar
-
-        self.search_bar = QLineEdit(self)
-        self.search_bar.setObjectName("SearchBar")
-        self.search_bar.setPlaceholderText("Search your library...")
-        self.search_bar.setFixedHeight(40)
-        self.vbox_container.addWidget(self.search_bar)
-
-        self.search_icon = ThemedPushButton(
-            theme_manager,
-            "assets/icons/search.svg",
-            "assets/icons/search-dark.svg",
-            20,
-            20,
-            0,
-            parent=self.search_bar,
-        )
-
-        self.search_icon.setFlat(True)
-        self.search_icon.setFocusPolicy(Qt.NoFocus)
-        self.search_icon.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.search_icon.setStyleSheet("background: transparent; border: none;")
-
-        search_bar_layout = QHBoxLayout(self.search_bar)
-        search_bar_layout.setContentsMargins(9, 0, 0, 0)
-        search_bar_layout.addWidget(self.search_icon)
-        search_bar_layout.addStretch()
-
-        # books display
-
-        self.vbox_container.addStretch()
+        if file_paths:
+            for path in file_paths:
+                self.books_manager.add_epub(path)
