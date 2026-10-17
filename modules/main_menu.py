@@ -1,5 +1,3 @@
-import sys
-import os
 from PySide6.QtWidgets import (
     QStackedWidget,
     QHBoxLayout,
@@ -8,10 +6,9 @@ from PySide6.QtWidgets import (
     QWidget,
     QSizePolicy,
     QLineEdit,
-    QListWidget,
 )
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QPixmap, QIcon
+from PySide6.QtGui import QPixmap
 from modules.theme_manager import ThemedPushButton, ThemeManager
 from modules.books_manager import BooksManager
 
@@ -134,6 +131,8 @@ class MainMenu(QWidget):
 
         self.side_bar_v_box.addWidget(self.import_button, alignment=Qt.AlignHCenter)
 
+        self.import_button.clicked.connect(self.on_import_button_pressed)
+
         self.side_bar_v_box.addStretch()
 
         # theme toggle button
@@ -185,12 +184,16 @@ class MainMenu(QWidget):
         self.main_view.setCurrentWidget(self.favourites)
         pass
 
+    def on_import_button_pressed(self, event):
+        print("add pressed!")
+        pass
+
 
 class Library(QWidget):
     def __init__(self, theme_manager, books_manager, parent):
         super().__init__(parent)
-        self.theme_manager = theme_manager
-        self.books_manager = books_manager
+        self.theme_manager: ThemeManager = theme_manager
+        self.books_manager: BooksManager = books_manager
 
         self.vbox_container = QVBoxLayout(self)
         self.setLayout(self.vbox_container)
@@ -238,12 +241,6 @@ class Library(QWidget):
         search_bar_layout.addStretch()
 
         # books display
-        self.card_grid = QListWidget(self)
-        self.card_grid.setViewMode(QListWidget.ViewMode.IconMode)
-        self.card_grid.setResizeMode(QListWidget.ViewMode.Adjust)
-        self.card_grid.setSpacing(15)
-
-        self.vbox_container.addWidget(self.card_grid)
 
         self.vbox_container.addStretch()
 

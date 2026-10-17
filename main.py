@@ -35,9 +35,9 @@ central_widget = QStackedWidget()
 window.setCentralWidget(central_widget)
 
 theme_manager = ThemeManager(app, True)
-book_manager = BooksManager(Path(__file__).resolve().parent)
+books_manager = BooksManager(Path(__file__).resolve().parent)
 
-main_menu = MainMenu(theme_manager)
+main_menu = MainMenu(theme_manager, books_manager)
 central_widget.addWidget(main_menu)
 
 window.show()

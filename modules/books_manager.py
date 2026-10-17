@@ -10,7 +10,7 @@ class Book(Model):
     title = CharField()
     book_directory = CharField()
     author = CharField()
-    cover_path = CharField()
+    cover_path = CharField(null=True)
     favourite = BooleanField(default=False)
 
 
@@ -32,8 +32,6 @@ class BooksManager:
         # create database if it doesnt exist
         self.books_database.create_tables([Book], safe=True)
 
-        self.books = Book.select()
-
     def add_epub(self, path_to_epub):
 
         file = Path(path_to_epub).resolve()
@@ -54,13 +52,14 @@ class BooksManager:
 
         cover_path = None
         for item in book.get_items():
-            if (
-                "cover" in item.get_name().lower()
-                or item.get_type() == ebooklib.ITEM_COVER
-            ):
-                cover_name = item.get_name()
-                cover_path = self.book_covers_folder / cover_name
-
+            is_cover_type = item.get_type() == ebooklib.ITEM_COVER
+            is_cover_image = (
+                item.get_type() == ebooklib.ITEM_IMAGE
+                and "cover" in item.get_name().lower()
+            )
+            if is_cover_type or is_cover_image:
+                ext = Path(item.get_name()).suffix or ".jpg"
+                cover_path = self.book_covers_folder / f"{file.stem}{ext}"
                 cover_path.write_bytes(item.get_content())
                 break
 
@@ -70,3 +69,23 @@ class BooksManager:
             author=author,
             cover_path=cover_path,
         )
+
+    def set_to_favourite(self, path):
+        return (
+            Book.update(favourite=True)
+            .where(Book.book_directory == str(path))
+            .execute()
+        )
+
+    def un_set_to_favourite(self, path):
+        return (
+            Book.update(favourite=False)
+            .where(Book.book_directory == str(path))
+            .execute()
+        )
+
+    def get_all_books(self):
+        return list(Book.select())
+
+    def get_all_favourite_books(self):
+        return list(Book.select().where(Book.favourite == True))
