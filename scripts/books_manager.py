@@ -1,10 +1,11 @@
 import ebooklib
 from pathlib import Path
-import shutil
 from ebooklib import epub
 from peewee import SqliteDatabase, Model, CharField, AutoField, BooleanField
 import uuid
 import hashlib
+import shutil
+import mimetypes
 
 
 class Book(Model):
@@ -17,14 +18,14 @@ class Book(Model):
 
 
 class BooksManager:
-    def __init__(self, root_path):
-        self.books_data_base_path = Path(root_path).resolve() / "data" / "books.db"
+    def __init__(self):
+        self.books_data_base_path = Path("data") / "books.db"
         self.books_data_base_path.parent.mkdir(parents=True, exist_ok=True)
 
-        self.books_folder = Path(root_path).resolve() / "data" / "books"
+        self.books_folder = Path("data") / "books"
         self.books_folder.mkdir(parents=True, exist_ok=True)
 
-        self.book_covers_folder = Path(root_path).resolve() / "data" / "covers"
+        self.book_covers_folder = Path("data") / "covers"
         self.book_covers_folder.mkdir(parents=True, exist_ok=True)
 
         self.books_database = SqliteDatabase(self.books_data_base_path)
@@ -37,21 +38,21 @@ class BooksManager:
     def add_epub(self, path_to_epub):
         # making sure book exists
         file = Path(path_to_epub).resolve()
-        if not file.exists():
+        if not file.is_file():
             print("unable to find the epub file at the location: ", path_to_epub)
             return
 
         # makes sure user isnt trying to import an already existing book
         imported_book_hash = hashlib.sha256()
 
-        with open(file, "rb") as f:
+        with file.open("rb") as f:
             for chunk in iter(lambda: f.read(8192), b""):
                 imported_book_hash.update(chunk)
 
         for path in self.books_folder.rglob("*.epub"):
             book_hash = hashlib.sha256()
 
-            with open(path, "rb") as f:
+            with Path(path).open("rb") as f:
                 for chunk in iter(lambda: f.read(8192), b""):
                     book_hash.update(chunk)
 
@@ -94,10 +95,23 @@ class BooksManager:
 
         Book.create(
             title=title,
-            book_directory=book_directory,
+            book_directory=str(book_directory),
             author=author,
-            cover_path=cover_path,
+            cover_path=str(cover_path) if cover_path else None,
         )
+
+    def remove_epub(self, id):
+        book = Book.select().where(Book.id == id).first()
+
+        if not book:
+            print("unable to find book to delete.")
+            return
+
+        if book.cover_path:
+            Path(book.cover_path).unlink(missing_ok=True)
+        Path(book.book_directory).unlink(missing_ok=True)
+
+        book.delete_instance()
 
     def set_to_favourite(self, path):
         return (

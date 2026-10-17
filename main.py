@@ -1,44 +1,30 @@
-import sys
-import os
-from pathlib import Path
-from PySide6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QStackedWidget,
-)
+from PySide6.QtWidgets import QApplication, QWidget, QStackedWidget
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from modules.main_menu import MainMenu
-from modules.theme_manager import ThemeManager
-from modules.books_manager import BooksManager
+import sys
+
+from scripts.theme_manager import ThemeManager
+from scripts.books_manager import BooksManager
+from scripts.main_menu import MainMenu
 
 app = QApplication(sys.argv)
 
-window = QMainWindow()
+# window configuration
+window = QStackedWidget()
+window.setObjectName("Window")
+window.setAttribute(Qt.WA_StyledBackground, True)
 
-# window settings
 window.setWindowTitle("Star Reader")
-window.resize(800, 600)
-window.setMinimumSize(800, 600)
-
-# ensuring the task bar icon is the app icon
-if os.name == "nt":
-    import ctypes
-
-    myappid = "mycompany.myproduct.subproduct.version"  # Arbitrary unique string
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-
-# this sets the icon and
 window.setWindowIcon(QIcon("assets/app-icon.png"))
+window.resize(800, 600)
 
-
-central_widget = QStackedWidget()
-window.setCentralWidget(central_widget)
-
-theme_manager = ThemeManager(app, True)
-books_manager = BooksManager(Path(__file__).resolve().parent)
+theme_manager = ThemeManager(app)
+books_manager = BooksManager()
 
 main_menu = MainMenu(theme_manager, books_manager)
-central_widget.addWidget(main_menu)
+
+window.addWidget(main_menu)
+window.setCurrentWidget(main_menu)
 
 window.show()
 sys.exit(app.exec())

@@ -1,27 +1,32 @@
 from PySide6.QtWidgets import QApplication, QPushButton, QLabel, QGraphicsOpacityEffect
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import QObject, Signal, QSize, Qt, QPropertyAnimation, QEasingCurve
+from pathlib import Path
 
 
 class ThemeManager(QObject):
     set_to_dark: Signal = Signal()
     set_to_light: Signal = Signal()
 
-    def __init__(self, app: QApplication, dark_mode: bool = True):
+    def __init__(self, app: QApplication):
         super().__init__()
 
         self.app = app
-        self.is_dark_mode = dark_mode
+
+        self.settings_file_path = Path("data/is_dark_mode.txt")
+
+        if not self.settings_file_path.exists():
+            self.settings_file_path.touch()
+            self.settings_file_path.write_text("0")
+
+        self.is_dark_mode = self.settings_file_path.read_text() == "1"
 
         self.transition_speed_MS = 300
 
-        with open("assets/themes/light.qss", "r", encoding="utf-8") as file:
-            self.light_mode_qss = file.read()
+        self.light_mode_qss = Path("assets/light.qss").read_text()
+        self.dark_mode_qss = Path("assets/dark.qss").read_text()
 
-        with open("assets/themes/dark.qss", "r", encoding="utf-8") as file:
-            self.dark_mode_qss = file.read()
-
-        if dark_mode:
+        if self.is_dark_mode:
             self.app.setStyleSheet(self.dark_mode_qss)
         else:
             self.app.setStyleSheet(self.light_mode_qss)
@@ -31,11 +36,13 @@ class ThemeManager(QObject):
     def set_dark_mode(self):
         self.is_dark_mode = True
         self.app.setStyleSheet(self.dark_mode_qss)
+        self.settings_file_path.write_text("1")
         self.set_to_dark.emit()
 
     def set_light_mode(self):
         self.is_dark_mode = False
         self.app.setStyleSheet(self.light_mode_qss)
+        self.settings_file_path.write_text("0")
         self.set_to_light.emit()
 
     def toggle_theme(self):
@@ -81,11 +88,9 @@ class ThemeManager(QObject):
 
     def update(self):
         if self.is_dark_mode:
-            self.is_dark_mode = True
-            self.app.setStyleSheet(self.dark_mode_qss)
+            self.set_dark_mode()
         else:
-            self.is_dark_mode = False
-            self.app.setStyleSheet(self.light_mode_qss)
+            self.set_light_mode()
 
 
 class ThemedPushButton(QPushButton):
