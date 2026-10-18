@@ -24,7 +24,7 @@ window.setObjectName("Window")
 window.setAttribute(Qt.WA_StyledBackground, True)
 
 window.setWindowTitle("Star Reader")
-window.setWindowIcon(QIcon("assets/app-icon.png"))
+window.setWindowIcon(QIcon("assets/images/app-icon.png"))
 window.resize(800, 600)
 
 theme_manager = ThemeManager(app)
