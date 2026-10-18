@@ -1,8 +1,14 @@
+import os, sys
+
+# insures relative paths work even when
+if getattr(sys, "frozen", False):
+    os.chdir(sys._MEIPASS)
+
 from PySide6.QtWidgets import QApplication, QWidget, QStackedWidget
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWebEngineWidgets import QWebEngineView
-import sys
+
 
 from scripts.theme_manager import ThemeManager
 from scripts.books_manager import BooksManager
