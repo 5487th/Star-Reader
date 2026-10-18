@@ -248,7 +248,7 @@ class Reader(QWebEngineView):
         }
         """
 
-        self.page().runJavaScript(js, lambda: None)
+        self.page().runJavaScript(js, lambda result: None)
 
     def back_button_pressed(self):
         self.books_manager.set_chapter_number(
