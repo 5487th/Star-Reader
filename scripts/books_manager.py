@@ -1,7 +1,7 @@
 import ebooklib
 from pathlib import Path
 from ebooklib import epub
-from peewee import SqliteDatabase, Model, CharField, AutoField, BooleanField
+from peewee import SqliteDatabase, Model, CharField, AutoField, IntegerField
 import uuid
 import hashlib
 import shutil
@@ -16,7 +16,7 @@ class Book(Model):
     book_directory = CharField()
     author = CharField()
     cover_path = CharField(null=True)
-    favourite = BooleanField(default=False)
+    chapter_number = IntegerField(default=0)
 
 
 class BooksManager:
@@ -96,8 +96,10 @@ class BooksManager:
                     )
                 )
             )
-        cover_path = self.book_covers_folder / f"{file.stem}_{uuid.uuid4().hex}{ext}"
-        cover_path.write_bytes(data)
+            cover_path = (
+                self.book_covers_folder / f"{file.stem}_{uuid.uuid4().hex}{ext}"
+            )
+            cover_path.write_bytes(data)
 
         Book.create(
             title=title,
@@ -119,22 +121,8 @@ class BooksManager:
 
         book.delete_instance()
 
-    def set_to_favourite(self, path):
-        return (
-            Book.update(favourite=True)
-            .where(Book.book_directory == str(path))
-            .execute()
-        )
-
-    def un_set_to_favourite(self, path):
-        return (
-            Book.update(favourite=False)
-            .where(Book.book_directory == str(path))
-            .execute()
-        )
-
     def get_all_books(self):
         return list(Book.select())
 
-    def get_all_favourite_books(self):
-        return list(Book.select().where(Book.favourite == True))
+    def set_chapter_number(self, id, chapter_number):
+        Book.update(chapter_number=chapter_number).where(Book.id == id).execute()

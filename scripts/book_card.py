@@ -19,6 +19,7 @@ from pathlib import Path
 
 class BookCard(QWidget):
     delete_button_clicked: Signal = Signal(QWidget)
+    cover_clicked: Signal = Signal(QWidget)
 
     def __init__(
         self,
@@ -27,17 +28,18 @@ class BookCard(QWidget):
         book_directory,
         book_title,
         cover_path,
-        is_favourite,
+        chapter_number,
         theme_manager,
     ):
         super().__init__(parent)
 
         self.theme_manager = theme_manager
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.book_id = book_id
         self.book_title = book_title
         self.book_directory = book_directory
-        self.is_favourite = is_favourite
+        self.chapter_number = chapter_number
 
         self.setMinimumSize(100, 200)
         self.setAttribute(Qt.WA_StyledBackground, True)
@@ -53,7 +55,9 @@ class BookCard(QWidget):
                 140,
                 280,
             )
+            self.cover.setAttribute(Qt.WA_TransparentForMouseEvents)
             self.vbox_layout.addWidget(self.cover)
+
         else:
             self.cover = QLabel(book_title)
             self.cover.setObjectName("BookCoverTittle")
@@ -62,8 +66,9 @@ class BookCard(QWidget):
             self.cover.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.cover.setWordWrap(True)
             self.vbox_layout.addWidget(self.cover)
+            self.cover.setAttribute(Qt.WA_TransparentForMouseEvents)
 
-        self.details_button = ThemedPushButton(
+        self.delete_button = ThemedPushButton(
             self.theme_manager,
             "assets/images/trash.svg",
             "assets/images/trash.svg",
@@ -72,13 +77,13 @@ class BookCard(QWidget):
             0,
             self,
         )
-        self.details_button.setStyleSheet(
+        self.delete_button.setStyleSheet(
             "background-color: rgba(32, 32, 33, 0.467);  border-radius: 10px; border-top-left-radius: 0px; border-bottom-right-radius: 0px;  "
         )
-        self.details_button.setFixedSize(40, 40)
-        self.details_button.raise_()
-        self.details_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.details_button.clicked.connect(
+        self.delete_button.setFixedSize(40, 40)
+        self.delete_button.raise_()
+        self.delete_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.delete_button.clicked.connect(
             lambda: self.delete_button_clicked.emit(self)
         )
 
@@ -87,10 +92,16 @@ class BookCard(QWidget):
 
         # Position button in the bottom-left corner
         margin = 5
-        self.details_button.move(
+        self.delete_button.move(
             9,
-            self.height() - self.details_button.height() - 9,
+            self.height() - self.delete_button.height() - 9,
         )
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.cover_clicked.emit(self)
+
+        QWidget.mousePressEvent(self, event)
 
 
 class RoundedImage(QLabel):

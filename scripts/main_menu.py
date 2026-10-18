@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QMessageBox,
 )
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QFileDialog
 
@@ -19,6 +19,8 @@ from scripts.book_card import BookCard
 
 
 class MainMenu(QWidget):
+    book_opened: Signal = Signal(BookCard)
+
     def __init__(
         self, theme_manager: ThemeManager, books_manager: BooksManager, parent=None
     ):
@@ -183,11 +185,12 @@ class MainMenu(QWidget):
                 book.book_directory,
                 book.title,
                 book.cover_path,
-                book.favourite,
+                book.chapter_number,
                 self.theme_manager,
             )
             card.delete_button_clicked.connect(self.on_delete_button_pressed)
             self.books_display_layout.addWidget(card)
+            card.cover_clicked.connect(self.on_card_clicked)
             self.cards.append(card)
 
     def on_import_button_pressed(self, event):
@@ -230,3 +233,6 @@ class MainMenu(QWidget):
         else:
             for card in self.cards:
                 card.setVisible(True)
+
+    def on_card_clicked(self, card: BookCard):
+        self.book_opened.emit(card)
